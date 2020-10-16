@@ -1,0 +1,46 @@
+version: '3'
+
+services:
+  nodered:
+    image: nodered/node-red
+    container_name: nodered
+    command: [--safe]
+    ports:
+      - '1880:1880'
+    expose:
+      - '1880'
+    volumes:
+      - $PWD/nodered/node-red-data:/data
+    networks:
+      soa_auth_token:
+        ipv4_address: 172.20.0.2
+  mongo:
+    image: mongo:4.2.0-bionic
+    container_name: mymongo
+    command: [--auth]
+    ports:
+      - '27017:27017'
+    expose:
+      - '27017'
+    volumes:
+      - $PWD/mongodb/mongodb-data:/data/db
+    networks:
+      soa_auth_token:
+        ipv4_address: 172.20.0.3
+  redis:
+    image: redis:5.0.9-alpine
+    container_name: myredis
+    command: [ "redis-server", "/usr/local/etc/redis/redis.conf" ]
+    expose:
+      - '6379'
+    volumes:
+      - $PWD/redis/redis.conf:/usr/local/etc/redis/redis.conf
+    networks:
+      soa_auth_token:
+        ipv4_address: 172.20.0.4
+networks:
+  soa_auth_token:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
